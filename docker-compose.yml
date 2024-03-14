@@ -1,0 +1,9 @@
+services: 
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: webapp
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ContactsDb
+    ports:
+      - "5432:5432"

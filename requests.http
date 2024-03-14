@@ -1,0 +1,14 @@
+### GetContacts
+GET http://localhost:5000/api/contacts
+
+### UpdateContact
+PUT http://localhost:5000/api/contacts
+Content-Type: application/json
+
+{
+    "id": "CCC51159-2AC7-435B-B7D2-4CC25791622D",
+    "firstName": "Carol",
+    "lastName": "Williams-Lancaster",
+    "email": "carol-williams-lancaster@gmail.com",
+    "phone": "555-3456"
+}

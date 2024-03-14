@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Serilog;
+using WebApp.Contacts;
 
 namespace WebApp.CompositionRoot;
 
@@ -9,7 +10,8 @@ public static class Middleware
     {
         app.UseSerilogRequestLogging();
         app.UseRouting();
-        app.UseHealthChecks("/");
+        app.MapHealthChecks("/");
+        app.MapContactEndpoints();
         return app;
     }
 }
