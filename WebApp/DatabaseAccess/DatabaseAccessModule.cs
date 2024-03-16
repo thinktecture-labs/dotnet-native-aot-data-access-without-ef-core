@@ -1,11 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 using Light.EmbeddedResources;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Npgsql;
-using WebApp.DatabaseAccess.Precompiled;
 
 namespace WebApp.DatabaseAccess;
 
@@ -14,15 +14,19 @@ public static class DatabaseAccessModule
     public static IServiceCollection AddDatabaseAccess(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("Default");
-        var npgsqlDataSource = new NpgsqlDataSourceBuilder(connectionString).Build();
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            throw new InvalidDataException("Could not find default connection string in app settings");
+        }
+
         return services
-           .AddSingleton(npgsqlDataSource)
-           .AddScoped<NpgsqlConnection>(sp => sp.GetRequiredService<NpgsqlDataSource>().CreateConnection())
-           .AddDbContext<DatabaseContext>(
-                options => options
-                   .UseNpgsql(npgsqlDataSource)
-                   .UseModel(DatabaseContextModel.Instance)
-            );
+           .AddSingleton<NpgsqlDataSource>(
+                sp =>
+                    new NpgsqlDataSourceBuilder(connectionString)
+                       .UseLoggerFactory(sp.GetRequiredService<ILoggerFactory>())
+                       .Build()
+            )
+           .AddScoped<NpgsqlConnection>(sp => sp.GetRequiredService<NpgsqlDataSource>().CreateConnection());
     }
 
     public static async Task SetUpDatabaseAsync(this WebApplication app)
