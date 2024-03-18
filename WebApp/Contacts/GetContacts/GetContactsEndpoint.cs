@@ -1,9 +1,10 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Light.EmbeddedResources;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using WebApp.CommonValidation;
 using WebApp.DatabaseAccess;
 
@@ -18,7 +19,7 @@ public static class GetContactsEndpoint
     }
 
     public static async Task<IResult> GetContacts(
-        DatabaseContext dbContext,
+        NpgsqlConnection npgsqlConnection,
         PagingParametersValidator validator,
         int skip = 0,
         int take = 20,
@@ -30,13 +31,22 @@ public static class GetContactsEndpoint
             return Results.BadRequest(errors);
         }
 
-        var dtoList = await dbContext
-           .Contacts
-           .OrderBy(c => c.LastName)
-           .Skip(skip)
-           .Take(take)
-           .Select(c => new ContactListDto(c.Id, c.LastName, c.FirstName, c.Email, c.Phone))
-           .ToListAsync(cancellationToken);
+        await npgsqlConnection.OpenAsync(cancellationToken);
+        await using var command = npgsqlConnection.CreateCommand();
+        command.CommandText = typeof(GetContactsEndpoint).GetEmbeddedResource("GetContacts.sql");
+        command.Parameters.Add(new NpgsqlParameter<int> { TypedValue = skip });
+        command.Parameters.Add(new NpgsqlParameter<int> { TypedValue = take });
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        var dtoList = new List<ContactListDto>();
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            var id = reader.GetGuid(0);
+            var lastName = reader.GetString(1);
+            var firstName = reader.GetString(2);
+            var email = reader.GetOptional<string>(3);
+            var phone = reader.GetOptional<string>(4);
+            dtoList.Add(new ContactListDto(id, lastName, firstName, email, phone));
+        }
 
         return Results.Ok(dtoList);
     }
