@@ -17,8 +17,13 @@
     <ItemGroup>
         <EmbeddedResource Include="DatabaseAccess\DatabaseSetup.sql" />
         <EmbeddedResource Include="Contacts\GetContacts\GetContacts.sql" />
-        <EmbeddedResource Include="Contacts\UpdateContact\GetContact.sql" />
-        <EmbeddedResource Include="Contacts\UpdateContact\UpdateContact.sql" />
+        <EmbeddedResource Include="Contacts\Common\GetContact.sql" />
+        <EmbeddedResource Include="Contacts\DeleteContact\DeleteAddresses.sql" />
+        <EmbeddedResource Include="Contacts\DeleteContact\DeleteContact.sql" />
+        <EmbeddedResource Include="Contacts\UpsertContact\DeleteAddress.sql" />
+        <EmbeddedResource Include="Contacts\UpsertContact\GetContactAddresses.sql" />
+        <EmbeddedResource Include="Contacts\UpsertContact\UpsertAddress.sql" />
+        <EmbeddedResource Include="Contacts\UpsertContact\UpsertContact.sql" />
     </ItemGroup>
 
 </Project>

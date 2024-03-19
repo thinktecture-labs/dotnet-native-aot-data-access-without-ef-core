@@ -13,6 +13,6 @@ public abstract class AsyncNpgsqlSession : AsyncReadOnlyNpgsqlSession, IAsyncSes
     )
         : base(connection, transactionLevel) { }
 
-    public Task SaveChangesAsync(CancellationToken cancellationToken = default) =>
+    public virtual Task SaveChangesAsync(CancellationToken cancellationToken = default) =>
         Transaction!.CommitAsync(cancellationToken);
 }
