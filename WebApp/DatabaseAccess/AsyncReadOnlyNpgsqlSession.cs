@@ -15,7 +15,7 @@ public abstract class AsyncReadOnlyNpgsqlSession : IAsyncReadOnlySession
 
     protected NpgsqlConnection Connection { get; }
     protected IsolationLevel? TransactionLevel { get; }
-    protected NpgsqlTransaction? Transaction { get; private set; }
+    public NpgsqlTransaction? Transaction { get; private set; }
 
     private bool IsInitialized
     {
@@ -44,6 +44,19 @@ public abstract class AsyncReadOnlyNpgsqlSession : IAsyncReadOnlySession
     {
         Transaction?.Dispose();
         Connection.Dispose();
+    }
+
+    public ValueTask<NpgsqlConnection> GetInitializedConnectionAsync(CancellationToken cancellationToken = default)
+    {
+        return IsInitialized ?
+            new ValueTask<NpgsqlConnection>(Connection) :
+            InitializeAndGetConnectionAsync(cancellationToken);
+    }
+    
+    private async ValueTask<NpgsqlConnection> InitializeAndGetConnectionAsync(CancellationToken cancellationToken)
+    {
+        await InitializeAsync(cancellationToken);
+        return Connection;
     }
 
     public ValueTask<NpgsqlCommand> CreateCommandAsync(

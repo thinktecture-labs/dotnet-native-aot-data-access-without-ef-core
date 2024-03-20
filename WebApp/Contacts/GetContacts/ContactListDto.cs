@@ -2,10 +2,11 @@ using System;
 
 namespace WebApp.Contacts.GetContacts;
 
-public readonly record struct ContactListDto(
-    Guid Id,
-    string FirstName,
-    string LastName,
-    string? Email,
-    string? PhoneNumber
-);
+public sealed class ContactListDto
+{
+    public Guid Id { get; set; }
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public string? Email { get; set; }
+    public string? PhoneNumber { get; set; }
+}

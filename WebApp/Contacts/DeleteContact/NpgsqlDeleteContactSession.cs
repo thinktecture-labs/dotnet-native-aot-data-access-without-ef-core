@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Dapper;
 using Light.EmbeddedResources;
 using Npgsql;
 using WebApp.Contacts.Common;
@@ -27,16 +28,17 @@ public sealed class NpgsqlDeleteContactSession : AsyncNpgsqlSession, IDeleteCont
 
     public async Task DeleteContactAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        await using var batch = await CreateBatchAsync(cancellationToken);
-        batch.BatchCommands.Add(CreateBatchCommandWithContactId(DeleteAddressesSql, id));
-        batch.BatchCommands.Add(CreateBatchCommandWithContactId(DeleteContactSql, id));
-        await batch.ExecuteNonQueryAsync(cancellationToken);
-    }
+        var connection = await GetInitializedConnectionAsync(cancellationToken);
+        await connection.ExecuteAsync(
+            DeleteAddressesSql,
+            new { ContactId = id },
+            Transaction
+        );
 
-    private static NpgsqlBatchCommand CreateBatchCommandWithContactId(string sql, Guid id)
-    {
-        var batchCommand = new NpgsqlBatchCommand(sql);
-        batchCommand.Parameters.Add(new NpgsqlParameter<Guid> { TypedValue = id });
-        return batchCommand;
+        await connection.ExecuteAsync(
+            DeleteContactSql,
+            new { Id = id },
+            Transaction
+        );
     }
 }

@@ -9,4 +9,4 @@
        a."City"
 FROM "Contacts" c
      LEFT JOIN "Addresses" a ON c."Id" = a."ContactID"
-WHERE c."Id" = $1;
+WHERE c."Id" = @Id;

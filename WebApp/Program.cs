@@ -1,9 +1,12 @@
 using System;
 using System.Threading.Tasks;
+using Dapper;
 using Microsoft.AspNetCore.Builder;
 using Serilog;
 using WebApp.CompositionRoot;
 using WebApp.DatabaseAccess;
+
+[module:DapperAot]
 
 namespace WebApp;
 

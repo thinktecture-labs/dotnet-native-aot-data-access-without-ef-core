@@ -2,14 +2,15 @@
 
 namespace WebApp.Contacts.Common;
 
-public readonly record struct GetContactRecord(
-    Guid ContactId,
-    string FirstName,
-    string LastName,
-    string? Email,
-    string? Phone,
-    Guid? AddressId,
-    string? Street,
-    string? ZipCode,
-    string? City
-);
+public sealed class GetContactRecord
+{
+    public Guid ContactId { get; set; }
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public string? Email { get; set; }
+    public string? Phone { get; set; }
+    public Guid? AddressId { get; set; }
+    public string? Street { get; set; }
+    public string? ZipCode { get; set; }
+    public string? City { get; set; }
+}

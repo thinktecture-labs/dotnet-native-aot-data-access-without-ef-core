@@ -1,2 +1,2 @@
 ﻿DELETE FROM "Addresses"
-WHERE "ContactID" = $1;
+WHERE "ContactID" = @ContactId;
